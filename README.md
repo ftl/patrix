@@ -1,6 +1,6 @@
 # PATRiX
 
-Pulse Audio Transceiver - transmit and receive digital modes through the Pulse Audio framework.
+Pulse Audio Transceiver - transmit and receive digital modes through the Pulse Audio library.
 
 ## Usage
 
