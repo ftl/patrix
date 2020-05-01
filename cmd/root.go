@@ -8,6 +8,8 @@ import (
 	"syscall"
 
 	"github.com/spf13/cobra"
+
+	"github.com/ftl/patrix/pa"
 )
 
 var rootFlags = struct {
@@ -18,7 +20,6 @@ var rootCmd = &cobra.Command{
 	Short: "PATRiX - transmit and receive digital modes through the Pulse Audio framework",
 }
 
-// Execute is called by main.main() as the entry point to the Cobra framework.
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		log.Fatal(err)
@@ -28,18 +29,20 @@ func Execute() {
 func init() {
 }
 
-func runWithOscillator(f func(ctx context.Context, cmd *cobra.Command, args []string /*, oscillator */)) func(cmd *cobra.Command, args []string) {
+func runWithOscillator(f func(ctx context.Context, cmd *cobra.Command, args []string, oscillator *pa.Oscillator)) func(cmd *cobra.Command, args []string) {
 	return func(cmd *cobra.Command, args []string) {
-		// TODO instanciate the oscillator
+		oscillator, err := pa.NewOscillator()
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer oscillator.Close()
 
 		ctx, cancel := context.WithCancel(context.Background())
 		signals := make(chan os.Signal, 1)
 		signal.Notify(signals, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
-		go handleCancelation(signals, cancel, func() error { return nil } /* oscillator.Shutdown */)
+		go handleCancelation(signals, cancel, oscillator.Close)
 
-		f(ctx, cmd, args /* oscillator */)
-
-		// shut the oscillator down
+		f(ctx, cmd, args, oscillator)
 	}
 }
 

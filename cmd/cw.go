@@ -8,6 +8,8 @@ import (
 
 	"github.com/ftl/digimodes/cw"
 	"github.com/spf13/cobra"
+
+	"github.com/ftl/patrix/pa"
 )
 
 var cwFlags = struct {
@@ -30,7 +32,7 @@ func init() {
 	cwCmd.Flags().IntVar(&cwFlags.beacon, "beacon", 0, "number of seconds between transmissions (0 == single transmission)")
 }
 
-func runCW(ctx context.Context, cmd *cobra.Command, args []string /*, oscillator */) {
+func runCW(ctx context.Context, cmd *cobra.Command, args []string, oscillator *pa.Oscillator) {
 	if len(args) < 1 {
 		log.Fatal("Need text as parameter. Try cw --help")
 	}
