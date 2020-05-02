@@ -54,7 +54,7 @@ func (o *Oscillator) Stop(ctx context.Context) {
 	o.Oscillator.Modulator = osc.NoModulator
 	select {
 	// wait until all the remaining samples are processed by pulse audio
-	case <-time.After(time.Duration(float64(o.stream.BufferSize())*o.Oscillator.Tick()) * time.Second):
+	case <-time.After(time.Duration(float64(o.stream.BufferSize())*o.Oscillator.Tick()*1.5) * time.Second):
 	case <-ctx.Done():
 	}
 	o.stream.Stop()
