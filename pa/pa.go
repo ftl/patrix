@@ -26,7 +26,7 @@ func NewOscillator() (*Oscillator, error) {
 		return nil, fmt.Errorf("cannot get pulse audio default sink: %v", err)
 	}
 	oscillator := osc.New(sink.SampleRate())
-	stream, err := client.NewPlayback(pulse.Float32Reader(oscillator.Synth32), pulse.PlaybackSink(sink), pulse.PlaybackSampleRate(sink.SampleRate()))
+	stream, err := client.NewPlayback(pulse.Float32Reader(oscillator.Synth32), pulse.PlaybackSink(sink), pulse.PlaybackSampleRate(sink.SampleRate()), pulse.PlaybackLatency(0.5))
 	if err != nil {
 		return nil, fmt.Errorf("cannot create pulse audio playback stream: %v", err)
 	}
