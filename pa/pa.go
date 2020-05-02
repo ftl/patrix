@@ -3,7 +3,6 @@ package pa
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/jfreymuth/pulse"
 
@@ -27,7 +26,7 @@ func NewOscillator() (*Oscillator, error) {
 		return nil, fmt.Errorf("cannot get pulse audio default sink: %v", err)
 	}
 	oscillator := osc.New(sink.SampleRate())
-	stream, err := client.NewPlayback(oscillator.Synth32, pulse.PlaybackSink(sink), pulse.PlaybackSampleRate(sink.SampleRate()))
+	stream, err := client.NewPlayback(pulse.Float32Reader(oscillator.Synth32), pulse.PlaybackSink(sink), pulse.PlaybackSampleRate(sink.SampleRate()))
 	if err != nil {
 		return nil, fmt.Errorf("cannot create pulse audio playback stream: %v", err)
 	}
@@ -52,10 +51,6 @@ func (o *Oscillator) Start() {
 
 func (o *Oscillator) Stop(ctx context.Context) {
 	o.Oscillator.Modulator = osc.NoModulator
-	select {
-	// wait until all the remaining samples are processed by pulse audio
-	case <-time.After(time.Duration(float64(o.stream.BufferSize())*o.Oscillator.Tick()*1.5) * time.Second):
-	case <-ctx.Done():
-	}
 	o.stream.Stop()
+	o.stream.Drain()
 }

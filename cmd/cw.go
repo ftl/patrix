@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"strings"
 	"time"
@@ -34,21 +35,22 @@ func init() {
 
 func runCW(ctx context.Context, cmd *cobra.Command, args []string, oscillator *pa.Oscillator) {
 	if len(args) < 1 {
-		log.Fatal("Need text as parameter. Try cw --help")
+		log.Fatal("Need text as parameter. See cw --help for more information")
 	}
-
 	text := strings.Join(args, " ")
 
-	symbols := make(chan cw.Symbol)
-	setKeyDown := func(keyDown bool) {
-		// modify the oscillator
-	}
-
-	go cw.Send(ctx, setKeyDown, symbols, cwFlags.wpm)
+	modulator := cw.NewModulator(float64(cwFlags.pitch), cwFlags.wpm)
+	defer modulator.Close()
+	modulator.AbortWhenDone(ctx.Done())
+	oscillator.Modulator = modulator
+	oscillator.Start()
+	defer oscillator.Stop(ctx)
 
 	for {
-		log.Print(text)
-		cw.WriteToSymbolStream(ctx, symbols, text)
+		_, err := fmt.Fprintln(modulator, text)
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		if cwFlags.beacon == 0 {
 			return

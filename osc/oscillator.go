@@ -44,7 +44,7 @@ func (o *Oscillator) Tick() float64 {
 	return o.tick
 }
 
-func (o *Oscillator) Synth32(out []float32) {
+func (o *Oscillator) Synth32(out []float32) (int, error) {
 	for i := range out {
 		out[i] = float32(o.amplitude * math.Cos(2*math.Pi*o.frequency*o.t+o.phase))
 		if o.Modulator != nil && (out[i] == 0 || (o.lastOut < 0 && out[i] > 0) || (o.lastOut > 0 && out[i] < 0)) {
@@ -54,9 +54,10 @@ func (o *Oscillator) Synth32(out []float32) {
 		o.lastOut = float64(out[i])
 		o.t += o.tick
 	}
+	return len(out), nil
 }
 
-func (o *Oscillator) Synth64(out []float64) {
+func (o *Oscillator) Synth64(out []float64) (int, error) {
 	for i := range out {
 		out[i] = o.amplitude * math.Cos(2*math.Pi*o.frequency*o.t+o.phase)
 		if o.Modulator != nil && (out[i] == 0 || (o.lastOut < 0 && out[i] > 0) || (o.lastOut > 0 && out[i] < 0)) {
@@ -66,4 +67,5 @@ func (o *Oscillator) Synth64(out []float64) {
 		o.lastOut = out[i]
 		o.t += o.tick
 	}
+	return len(out), nil
 }
