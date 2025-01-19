@@ -3,11 +3,14 @@ package pa
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jfreymuth/pulse"
 
 	"github.com/ftl/patrix/osc"
 )
+
+const latency float64 = 0.5
 
 type Oscillator struct {
 	*osc.Oscillator
@@ -26,7 +29,7 @@ func NewOscillator() (*Oscillator, error) {
 		return nil, fmt.Errorf("cannot get pulse audio default sink: %v", err)
 	}
 	oscillator := osc.New(sink.SampleRate())
-	stream, err := client.NewPlayback(pulse.Float32Reader(oscillator.Synth32), pulse.PlaybackSink(sink), pulse.PlaybackSampleRate(sink.SampleRate()), pulse.PlaybackLatency(0.5))
+	stream, err := client.NewPlayback(pulse.Float32Reader(oscillator.Synth32), pulse.PlaybackSink(sink), pulse.PlaybackSampleRate(sink.SampleRate()), pulse.PlaybackLatency(latency))
 	if err != nil {
 		return nil, fmt.Errorf("cannot create pulse audio playback stream: %v", err)
 	}
@@ -53,4 +56,5 @@ func (o *Oscillator) Stop(ctx context.Context) {
 	o.Oscillator.Modulator = osc.NoModulator
 	o.stream.Stop()
 	o.stream.Drain()
+	time.Sleep((time.Duration)(latency*1000) * time.Millisecond)
 }

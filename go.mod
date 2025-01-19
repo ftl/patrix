@@ -2,9 +2,10 @@ module github.com/ftl/patrix
 
 go 1.20
 
-// replace github.com/ftl/digimodes => ../digimodes
-
-// replace github.com/jfreymuth/pulse => ../pulse
+//replace (
+//	github.com/ftl/digimodes => ../digimodes
+//	github.com/jfreymuth/pulse => ../pulse
+//)
 
 require (
 	github.com/ftl/digimodes v0.0.0-20200502133046-0a4117101b05
