@@ -11,7 +11,7 @@ toolchain go1.23.6
 
 require (
 	github.com/ftl/digimodes v0.1.2
-	github.com/jfreymuth/pulse v0.1.0
+	github.com/jfreymuth/pulse v0.1.1
 	github.com/spf13/cobra v1.8.0
 )
 
