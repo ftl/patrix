@@ -3,7 +3,6 @@ package pa
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/jfreymuth/pulse"
 
@@ -54,7 +53,6 @@ func (o *Oscillator) Start() {
 
 func (o *Oscillator) Stop(ctx context.Context) {
 	o.Oscillator.Modulator = osc.NoModulator
-	o.stream.Stop()
 	o.stream.Drain()
-	time.Sleep((time.Duration)(latency*1000) * time.Millisecond)
+	o.stream.Stop()
 }
